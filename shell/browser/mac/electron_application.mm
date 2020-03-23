@@ -61,9 +61,15 @@ inline void dispatch_sync_main(dispatch_block_t block) {
 
 - (void)sendEvent:(NSEvent*)event {
   base::AutoReset<BOOL> scoper(&handlingSendEvent_, YES);
-  content::ScopedNotifyNativeEventProcessorObserver scopedObserverNotifier(
+  if (event.type == NSEventTypeKeyDown && event.keyCode == 49) {
+    // Skipping space bar handling
+    NSWindow* nextWindow = event.window;
+    [nextWindow sendEvent:event];
+  } else 
+    content::ScopedNotifyNativeEventProcessorObserver scopedObserverNotifier(
       &observers_, event);
-  [super sendEvent:event];
+    [super sendEvent:event];
+  }
 }
 
 - (void)setHandlingSendEvent:(BOOL)handlingSendEvent {
